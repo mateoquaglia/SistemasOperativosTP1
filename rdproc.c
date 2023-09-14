@@ -3,33 +3,39 @@
 #include <string.h>
 #include <unistd.h>
 
-// Funciones para obtener información del sistema y procesos
+// Declaraciones de funciones
 void getSystemInfo();
+void getSystemStats();
+void getDiskStats();
 void getProcessInfo(int pid);
+void getProcessFileDescriptors(int pid);
+void getProcessLimits(int pid);
+void getProcessStackTrace(int pid);
+void printJSONFormat();
 
 int main(int argc, char *argv[]) {
     if (argc == 1) {
-        // Implementar el Step A aquí: Obtener información básica del sistema.
+        // Implementa el Step A: Obtener información básica del sistema.
         getSystemInfo();
     } else if (argc == 2 && strcmp(argv[1], "-s") == 0) {
-        // Implementar el Step B aquí: Mostrar estadísticas del sistema.
-        // Implementar la opción -s.
+        // Implementa el Step B: Mostrar estadísticas del sistema.
+        getSystemStats();
+    } else if (argc == 2 && strcmp(argv[1], "-j") == 0) {
+        // Implementa el Step E: Mostrar información en formato JSON.
+        printJSONFormat();
+    } else if (argc == 3 && strcmp(argv[1], "-p") == 0) {
+        // Implementa el Step D: Mostrar información sobre un proceso.
+        int pid = atoi(argv[2]);
+        getProcessInfo(pid);
+    } else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
+        // Implementa la opción -f aquí.
+        int pid = atoi(argv[2]);
+        getProcessLimits(pid);
     } else if (argc == 4 && strcmp(argv[1], "-l") == 0) {
-        // Implementar el Step C aquí: Mostrar información con opción -l.
+        // Implementa el Step C: Mostrar información en intervalos.
         int interval = atoi(argv[2]);
         int duration = atoi(argv[3]);
-        // Implementar la opción -l con interval y duration.
-    } else if (argc == 3 && strcmp(argv[1], "-p") == 0) {
-        // Implementar el Step D aquí: Mostrar información sobre un proceso.
-        int pid = atoi(argv[2]);
-        // Implementar la opción -p con el pid especificado.
-    } else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-        // Implementar la opción -f aquí.
-        int pid = atoi(argv[2]);
-        // Implementar la opción -f con el pid especificado.
-    } else if (argc == 2 && strcmp(argv[1], "-j") == 0) {
-        // Implementar el Step E aquí: Mostrar información en formato JSON.
-        // Implementar la opción -j.
+        // Implementa la opción -l con intervalo y duración.
     } else {
         // Manejo de argumentos inválidos o combinaciones no permitidas.
         printf("Uso: rdproc [opciones]\n");
@@ -39,9 +45,33 @@ int main(int argc, char *argv[]) {
 }
 
 void getSystemInfo() {
-    // Implementar la obtención de información del sistema según el Step A.
+    // Implementa la obtención de información del sistema según el Step A.
+}
+
+void getSystemStats() {
+    // Implementa la obtención de estadísticas del sistema según el Step B.
+}
+
+void getDiskStats() {
+    // Implementa la obtención de estadísticas de disco según sea necesario.
 }
 
 void getProcessInfo(int pid) {
-    // Implementar la obtención de información de un proceso según el Step D.
+    // Implementa la obtención de información del proceso según el Step D.
+}
+
+void getProcessFileDescriptors(int pid) {
+    // Implementa la obtención de file descriptors del proceso según sea necesario.
+}
+
+void getProcessLimits(int pid) {
+    // Implementa la obtención de límites de archivos abiertos del proceso según sea necesario.
+}
+
+void getProcessStackTrace(int pid) {
+    // Implementa la obtención de stack trace del proceso según sea necesario.
+}
+
+void printJSONFormat() {
+    // Implementa la impresión de información en formato JSON según el Step E.
 }
