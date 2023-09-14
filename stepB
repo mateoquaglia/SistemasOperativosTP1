@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void getSystemStatistics() {
+    FILE *statFile = fopen("/proc/stat", "r");
+    if (statFile == NULL) {
+        perror("Error al abrir /proc/stat");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), statFile) != NULL) {
+        if (strstr(line, "cpu") != NULL) {
+            printf("Estadísticas de CPU:\n%s", line);
+        } else if (strstr(line, "ctxt") != NULL) {
+            printf("Cambios de contexto:\n%s", line);
+        } else if (strstr(line, "processes") != NULL) {
+            printf("Procesos creados desde el inicio del sistema:\n%s", line);
+        }
+    }
+
+    fclose(statFile);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc == 2 && strcmp(argv[1], "-s") == 0) {
+        getSystemStatistics();
+    } else {
+        printf("Uso: rdproc -s\n");
+    }
+
+    return 0;
+}
