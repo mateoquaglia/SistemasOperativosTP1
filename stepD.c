@@ -1,7 +1,5 @@
 #include "StepD.h"
-/*
- * permisos, tipo de archivo y el path de los file descriptors 
- */
+/*permisos, tipo de archivo y el path de los file descriptors*/
 void file_descriptors(int pid)
 {
   DIR *descriptor;
@@ -17,19 +15,18 @@ void file_descriptors(int pid)
 
   descriptor = opendir(direccion);
 
-  /* Para cada entrada del directorio imprime lo pedido en el enunciado */
   while( (entry=readdir(descriptor)) )
   {
-    if(files >= 2) /* Las dos primeras son los directorios actual y padre */
+    if(files >= 2) 
     {
-      /* Toma el file descriptor, genera los stats y el path */
+  
       sprintf(linea,"/proc/%d/fd/%s",pid,entry->d_name);
 
       stat(linea, &mystats);
 
       path = malloc(mystats.st_size + 1); // reservo dinamicamente memoria para almacenar el camino
 
-      /*  lectura, escritura y ejecución */
+      /* lectura, escritura y ejecución */
       printf( (mystats.st_mode & S_IRUSR) ? "r" : "-");
       printf( (mystats.st_mode & S_IWUSR) ? "w" : "-");
       printf( (mystats.st_mode & S_IXUSR) ? "x" : "-");
@@ -61,9 +58,7 @@ void file_descriptors(int pid)
   }
   closedir(descriptor);
 }
-/*
- * limites del proceso 
- */
+/* limites del proceso*/
 void limits(int pid)
 {
   char limits[45];
@@ -81,9 +76,7 @@ void limits(int pid)
 
   printf("Soft limits / Hard limits: %d / %d\n", soft, hard);
 }
-/*
- * stack trace 
- */
+/*stack trace*/
 void stack(int pid)
 {
   char stack[45];
@@ -97,17 +90,8 @@ void stack(int pid)
 
   while (fgets(linea, sizeof linea, trace) != NULL)
   {
-    /* Toma la primer línea, ignorando el primer string */
     sscanf(linea,"%*s %s", linea);
 
-    /* Si hay un +, elimina desde esa posición hasta el final */
-    if(strchr(linea,'+'))
-    {
-      /* Guarda la posición para acortar el string */
-      int len = (int) (strchr(linea,'+')-linea);
-      memmove(linea,linea,len);
-      linea[len] = '\0';
-    }
     printf("%s\n", linea);
   }
   fclose(trace);
