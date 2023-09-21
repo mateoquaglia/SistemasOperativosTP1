@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <sys/sysinfo.h>
 
-// Función para obtener información básica del sistema en formato JSON
+//  obtener info del sistema en formato JSON
 void printJSONFormat() {
     struct sysinfo si;
     if (sysinfo(&si) != 0) {
@@ -18,7 +18,6 @@ void printJSONFormat() {
     printf("\"cpu_model\": \"Intel i7 6700\",\n");  
     printf("\"kernel_version\": \"%s\",\n", sysinfo.version);
     printf("\"number_of_threads\": %ld,\n", si.procs);
-    // Agregar más campos JSON según sea necesario
     printf("}\n");
 }
 
