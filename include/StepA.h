@@ -7,8 +7,6 @@
 #include <stdbool.h>  //Booleanos
 #include <unistd.h>   //Clocks and Sleep
 
-#define JpS sysconf(_SC_CLK_TCK) //Jiffies/seconds (clock tics)
-
 void convertTime(int seconds, bool jiffies);
 void cpuinfo(void);
 void filesystem(void);
