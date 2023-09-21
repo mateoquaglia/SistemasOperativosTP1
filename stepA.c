@@ -29,7 +29,7 @@ void filesystem(void)
 
   char linea[1000];
 
-  /* lineas del archivo */
+  /* archivos soportados */
   while (fgets(linea, sizeof linea, files) != NULL) contador++;
   fclose(files);
 
