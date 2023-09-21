@@ -1,161 +1,114 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "StepD.h"
+/*
+ * permisos, tipo de archivo y el path de los file descriptors 
+ */
+void file_descriptors(int pid)
+{
+  DIR *descriptor;
+  struct dirent *entry;
+  struct stat mystats;
 
-// Función para obtener información de file descriptors de un proceso
-void getProcessFileDescriptors(int pid) {
-    char fdPath[PATH_MAX];
-    snprintf(fdPath, sizeof(fdPath), "/proc/%d/fd", pid);
+  int files = 0;
+  char direccion[100];
+  char linea[300];
+  char *path;
 
-    printf("File Descriptors del Proceso %d:\n", pid);
-    DIR *dir = opendir(fdPath);
-    if (dir == NULL) {
-        perror("Error al abrir el directorio de file descriptors");
-        return;
+  sprintf(direccion,"/proc/%d/fd",pid);
+
+  descriptor = opendir(direccion);
+
+  /* Para cada entrada del directorio imprime lo pedido en el enunciado */
+  while( (entry=readdir(descriptor)) )
+  {
+    if(files >= 2) /* Las dos primeras son los directorios actual y padre */
+    {
+      /* Toma el file descriptor, genera los stats y el path */
+      sprintf(linea,"/proc/%d/fd/%s",pid,entry->d_name);
+
+      stat(linea, &mystats);
+
+      path = malloc(mystats.st_size + 1); // reservo dinamicamente memoria para almacenar el camino
+
+      /*  lectura, escritura y ejecución */
+      printf( (mystats.st_mode & S_IRUSR) ? "r" : "-");
+      printf( (mystats.st_mode & S_IWUSR) ? "w" : "-");
+      printf( (mystats.st_mode & S_IXUSR) ? "x" : "-");
+      printf( (mystats.st_mode & S_IRGRP) ? "r" : "-");
+      printf( (mystats.st_mode & S_IWGRP) ? "w" : "-");
+      printf( (mystats.st_mode & S_IXGRP) ? "x" : "-");
+      printf( (mystats.st_mode & S_IROTH) ? "r" : "-");
+      printf( (mystats.st_mode & S_IWOTH) ? "w" : "-");
+      printf( (mystats.st_mode & S_IXOTH) ? "x" : "-");
+
+      /* tipo de archivo */
+      switch (mystats.st_mode & S_IFMT)
+      {
+        case S_IFBLK:  printf(" BLK "); break; /* Block */
+        case S_IFCHR:  printf(" CHR "); break; /* Character */
+        case S_IFDIR:  printf(" DIR "); break; /* Directory */
+        case S_IFIFO:  printf(" FIF "); break; /* FIFO/pipe */
+        case S_IFLNK:  printf(" LNK "); break; /* Symbolic link */
+        case S_IFREG:  printf(" REG "); break; /* Regular file */
+        case S_IFSOCK: printf(" SOK "); break; /* Socket */
+        default:       printf(" ??? "); break; /* Unknown */
+      }
+      readlink(linea,path,100);
+      printf("%s\n", path);
+
+      printf("\n");
     }
-
-    struct dirent *entry;
-    while ((entry = readdir(dir)) != NULL) {
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            printf("%s\n", entry->d_name);
-        }
-    }
-
-    closedir(dir);
+    files++;
+  }
+  closedir(descriptor);
 }
+/*
+ * limites del proceso 
+ */
+void limits(int pid)
+{
+  char limits[45];
+  sprintf(limits,"/proc/%d/limits",pid);
 
-// Función para obtener límites de archivos abiertos de un proceso
-void getProcessLimits(int pid) {
-    char limitsPath[PATH_MAX];
-    snprintf(limitsPath, sizeof(limitsPath), "/proc/%d/limits", pid);
+  FILE *limites = fopen(limits,"r");
 
-    printf("Límites de Archivos Abiertos del Proceso %d:\n", pid);
-    FILE *limitsFile = fopen(limitsPath, "r");
-    if (limitsFile == NULL) {
-        perror("Error al abrir el archivo de límites");
-        return;
-    }
+  int soft,hard;
+  char *linea;
 
-    char line[256];
-    while (fgets(line, sizeof(line), limitsFile) != NULL) {
-        printf("%s", line);
-    }
+  linea = obtenerInfo("Max open files",limites);
+  fclose(limites);
 
-    fclose(limitsFile);
+  sscanf(linea, "%*s %*s %d %d", &soft, &hard);
+
+  printf("Soft limits / Hard limits: %d / %d\n", soft, hard);
 }
+/*
+ * stack trace 
+ */
+void stack(int pid)
+{
+  char stack[45];
+  sprintf(stack,"sudo cat /proc/%d/stack",pid);
 
-// Función para obtener el stack trace del kernel de un proceso
-void getProcessStackTrace(int pid) {
-    char stackTracePath[PATH_MAX];
-    snprintf(stackTracePath, sizeof(stackTracePath), "/proc/%d/stack", pid);
+  char linea[1000];
 
-    printf("Stack Trace del Proceso %d:\n", pid);
-    FILE *stackTraceFile = fopen(stackTracePath, "r");
-    if (stackTraceFile == NULL) {
-        perror("Error al abrir el archivo de stack trace");
-        return;
+  FILE *trace = popen(stack,"r");
+
+  printf("%s\n", "Kernel Stack Trace:\n");
+
+  while (fgets(linea, sizeof linea, trace) != NULL)
+  {
+    /* Toma la primer línea, ignorando el primer string */
+    sscanf(linea,"%*s %s", linea);
+
+    /* Si hay un +, elimina desde esa posición hasta el final */
+    if(strchr(linea,'+'))
+    {
+      /* Guarda la posición para acortar el string */
+      int len = (int) (strchr(linea,'+')-linea);
+      memmove(linea,linea,len);
+      linea[len] = '\0';
     }
-
-    char line[256];
-    while (fgets(line, sizeof(line), stackTraceFile) != NULL) {
-        printf("%s", line);
-    }
-
-    fclose(stackTraceFile);
+    printf("%s\n", linea);
+  }
+  fclose(trace);
 }
-
-int main(int argc, char *argv[]) {
-    if (argc == 3 && strcmp(argv[1], "-p") == 0) {
-        int pid = atoi(argv[2]);
-        getProcessFileDescriptors(pid);
-    } else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-        int pid = atoi(argv[2]);
-        getProcessLimits(pid);
-    } else if (argc == 2 && strcmp(argv[1], "-t") == 0) {
-        int pid = getpid();  // Cambiar para usar el PID deseado
-        getProcessStackTrace(pid);
-    } else {
-        printf("Uso:\n");
-        printf("rdproc -p <pid> : Mostrar file descriptors de un proceso\n");
-        printf("rdproc -f <pid> : Mostrar límites de archivos abiertos de un proceso\n");
-        printf("rdproc -t       : Mostrar stack trace del kernel del proceso actual\n");
-    }
-
-    return 0;
-}
-
-/* Función para obtener información sobre un proceso
-void getProcessInfo(int pid) {
-    char procPath[256];
-    snprintf(procPath, sizeof(procPath), "/proc/%d/status", pid);
-
-    FILE *statusFile = fopen(procPath, "r");
-    if (statusFile == NULL) {
-        perror("Error al abrir el archivo /proc/<pid>/status");
-        exit(EXIT_FAILURE);
-    }
-
-    char line[256];
-    while (fgets(line, sizeof(line), statusFile) != NULL) {
-        // Procesa y muestra la información del proceso según tus necesidades
-        printf("%s", line);
-    }
-
-    fclose(statusFile);
-}
-
-// Función para obtener límites de archivos abiertos para un proceso
-void getProcessLimits(int pid) {
-    struct rlimit rlim;
-    if (getrlimit(RLIMIT_NOFILE, &rlim) != 0) {
-        perror("Error al obtener límites de archivos abiertos");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Límites de archivos abiertos para el proceso %d:\n", pid);
-    printf("Valor suave: %ld\n", rlim.rlim_cur);
-    printf("Valor máximo: %ld\n", rlim.rlim_max);
-}
-
-// Función para obtener el stack trace del kernel del proceso
-void getProcessStackTrace(int pid) {
-    void *array[10];  // Tamaño del array ajustable según tus necesidades
-    size_t size;
-
-    size = backtrace(array, sizeof(array) / sizeof(void *));
-    char **strings = backtrace_symbols(array, size);
-    if (strings == NULL) {
-        perror("Error al obtener el stack trace");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Stack trace del kernel para el proceso %d:\n", pid);
-    for (size_t i = 0; i < size; i++) {
-        printf("%s\n", strings[i]);
-    }
-
-    free(strings);
-}
-
-int main(int argc, char *argv[]) {
-    if (argc == 3 && strcmp(argv[1], "-p") == 0) {
-        int pid = atoi(argv[2]);
-        getProcessInfo(pid);
-    } else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-        int pid = atoi(argv[2]);
-        getProcessLimits(pid);
-    } else if (argc == 3 && strcmp(argv[1], "-t") == 0) {
-        int pid = atoi(argv[2]);
-        getProcessStackTrace(pid);
-    } else {
-        printf("Uso: rdproc -p <pid> | -f <pid> | -t <pid>\n");
-    }
-
-    return 0;
-}
-*/
