@@ -18,16 +18,12 @@ void cpuinfo(void)
         tipo, modelo);
 }
 
-
 void filesystem(void)
 {
   char path_files[] = "/proc/filesystems";
-
-  FILE *files = fopen(path_files,"r");
-
-  int contador = 0;
-
-  char linea[1000];
+ FILE *files = fopen(path_files,"r");
+ int contador = 0;
+ char linea[1000];
 
   /* archivos soportados */
   while (fgets(linea, sizeof linea, files) != NULL) contador++;
@@ -67,7 +63,6 @@ void imprimirDefault(void)
   uptime();
   filesystem();
 }
-
 /** Toma la version del kernel*/
 void kernelversion(void)
 {
@@ -102,9 +97,7 @@ char* obtenerInfo(char* key, FILE *archivo)
         valor = strchr(linea, ' ');
         resultado = strdup(valor);
       }
-
-      int len = strlen(resultado);
-      
+      int len = strlen(resultado);  
     }
   }
   return resultado;
