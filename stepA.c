@@ -1,21 +1,4 @@
 #include "StepA.h"
-
-void convertTime(int time, bool jiffies)
-{
-  int dias, horas, minutos, segundos;
-
-  /* Si son Jiffies, se los convierte a segundos */
-  if(jiffies) time = time/JpS;
-
-  
-  dias = time / 86400;
-  horas = (time % 86400) / 3600;
-  minutos = (time % 3600) / 60;
-  segundos = (time % 3600) % 60;
-
-  printf("%02d D, %02d:%02d:%02d\n", dias, horas, minutos, segundos);
-}
-
 /**
  * 'cpuinfo'
 */
@@ -48,13 +31,12 @@ void filesystem(void)
 
   char linea[1000];
 
-  /* Cuenta las lineas del archivo */
+  /* lineas del archivo */
   while (fgets(linea, sizeof linea, files) != NULL) contador++;
   fclose(files);
 
   printf("Cantidad de archivos soportados: %d\n", contador);
 }
-
 /**
  *  nombre fecha hora 
 */
@@ -80,7 +62,6 @@ void header(void)
 
   printf("%s %s %s\n", nombre, fecha, hora);
 }
-
 /**
  * Imprime la info
  */
@@ -107,7 +88,6 @@ void kernelversion(void)
   fclose(kernel);
   printf(" - Version de kernel: %s\n", version);
 }
-
 /**
  abre el archivo cpuinfo y busca la información pedida
 */
@@ -153,6 +133,6 @@ void uptime(void)
 
   fclose(tiempo);
 
-  printf("Tiempo transcurrido desde inicio: ");
-  convertTime(uptime,false);
+  printf("Tiempo transcurrido desde inicio: ",tiempo);
+  
 }
