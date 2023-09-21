@@ -1,14 +1,12 @@
 #include "StepA.h"
-/**
- * 'cpuinfo'
-*/
+/**'cpuinfo'*/
 void cpuinfo(void)
 {
-  char *tipo, *modelo;//, *cache, *cores;
+  char *tipo, *modelo;
 
   char path_info[] = "/proc/cpuinfo";
 
-  /*modo lectura */
+
   FILE *archivo = fopen(path_info,"r");
 
   tipo = obtenerInfo("vendor_id", archivo);
@@ -16,11 +14,11 @@ void cpuinfo(void)
   fclose(archivo);
 
   printf("\nInformación del CPU:\n");
-  printf(" - Tipo: %s\n - Modelo: %s\n",// - Cache: %s\n - Cores: %s\n",
-        tipo, modelo);//, cache, cores);
+  printf(" - Tipo: %s\n - Modelo: %s\n",
+        tipo, modelo);
 }
 
-/* cantidad de sistemas de archivos soportados por el kernel. */
+
 void filesystem(void)
 {
   char path_files[] = "/proc/filesystems";
@@ -37,9 +35,7 @@ void filesystem(void)
 
   printf("Cantidad de archivos soportados: %d\n", contador);
 }
-/**
- *  nombre fecha hora 
-*/
+/**  nombre fecha hora */
 void header(void)
 {
   char *nombre;
@@ -62,9 +58,7 @@ void header(void)
 
   printf("%s %s %s\n", nombre, fecha, hora);
 }
-/**
- * Imprime la info
- */
+/**Imprime la info*/
 void imprimirDefault(void)
 {
   header();
@@ -74,9 +68,7 @@ void imprimirDefault(void)
   filesystem();
 }
 
-/**
- * Toma la version del kernel.
-*/
+/** Toma la version del kernel*/
 void kernelversion(void)
 {
   char path_kernel[] = "/proc/sys/kernel/osrelease";
@@ -88,9 +80,7 @@ void kernelversion(void)
   fclose(kernel);
   printf(" - Version de kernel: %s\n", version);
 }
-/**
- abre el archivo cpuinfo y busca la información pedida
-*/
+/**abre el archivo cpuinfo y busca la información pedida*/
 char* obtenerInfo(char* key, FILE *archivo)
 {
   char *valor;
@@ -113,10 +103,8 @@ char* obtenerInfo(char* key, FILE *archivo)
         resultado = strdup(valor);
       }
 
-      /* Si hay una nueva linea al final del valor, la quita */
       int len = strlen(resultado);
-      if(resultado[len-1] == '\n') resultado[len-1] = 0;
-      break;
+      
     }
   }
   return resultado;
