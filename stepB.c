@@ -1,35 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "StepB.h"
 
-void getSystemStatistics() {
-    FILE *statFile = fopen("/proc/stat", "r");
-    if (statFile == NULL) {
-        perror("Error al abrir /proc/stat");
-        exit(EXIT_FAILURE);
-    }
+void cputimes(void)
+{
+  char path_times[] = "/proc/stat";
 
-    char line[256];
-    while (fgets(line, sizeof(line), statFile) != NULL) {
-        if (strstr(line, "cpu") != NULL) {
-            printf("Estadísticas de CPU:\n%s", line);
-        } else if (strstr(line, "ctxt") != NULL) {
-            printf("Cambios de contexto:\n%s", line);
-        } else if (strstr(line, "processes") != NULL) {
-            printf("Procesos creados desde el inicio del sistema:\n%s", line);
-        }
-    }
+  FILE *stat = fopen(path_times,"r");
 
-    fclose(statFile);
-}
+  int user, nice, system, idle;
+  int context, processes;
 
-int main(int argc, char *argv[]) {
-    if (argc == 2 && strcmp(argv[1], "-s") == 0) {
-        getSystemStatistics();
-    } else {
-        printf("Uso: rdproc -s\n");
-    }
+  char *cpu, *contexto, *procesos;
 
-    return 0;
+  cpu = obtenerInfo("cpu", stat);
+  contexto = obtenerInfo("ctxt", stat);
+  procesos = obtenerInfo("processes", stat);
+
+  fclose(stat);
+  sscanf(cpu,"%d %d %d %d",&user,&nice,&system,&idle);
+  sscanf(contexto, "%d", &context);
+  sscanf(procesos, "%d", &processes);
+
+  printf("Cantidad de tiempo de CPU utilizado por:\n");
+  printf(" - Usuario: ");
+  convertTime(user,true);
+  printf(" - Usuario (baja prioridad): ");
+  convertTime(nice,true);
+  printf(" - Sistema: ");
+  convertTime(system,true);
+  printf(" - Idle: ");
+  convertTime(idle,true);
+
+  printf("\nCantidad de cambios de contexto: %d\n", context);
+  printf("Cantidad de procesos creados: %d\n", processes);
 }
