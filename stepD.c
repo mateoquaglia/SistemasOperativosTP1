@@ -26,17 +26,6 @@ void file_descriptors(int pid)
 
       path = malloc(mystats.st_size + 1); // reservo dinamicamente memoria para almacenar el camino
 
-    
-      printf( (mystats.st_mode & S_IRUSR) ? "r" : "-");
-      printf( (mystats.st_mode & S_IWUSR) ? "w" : "-");
-      printf( (mystats.st_mode & S_IXUSR) ? "x" : "-");
-      printf( (mystats.st_mode & S_IRGRP) ? "r" : "-");
-      printf( (mystats.st_mode & S_IWGRP) ? "w" : "-");
-      printf( (mystats.st_mode & S_IXGRP) ? "x" : "-");
-      printf( (mystats.st_mode & S_IROTH) ? "r" : "-");
-      printf( (mystats.st_mode & S_IWOTH) ? "w" : "-");
-      printf( (mystats.st_mode & S_IXOTH) ? "x" : "-");
-
       switch (mystats.st_mode & S_IFMT)
       {
         case S_IFBLK:  printf(" BLK "); break; /* Block */
