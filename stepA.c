@@ -1,5 +1,4 @@
 #include "StepA.h"
-/**'cpuinfo'*/
 void cpuinfo(void)
 {
   char *tipo, *modelo;
@@ -18,11 +17,10 @@ void cpuinfo(void)
         tipo, modelo);
 }
 
-/**convierto el tiempo a dd hh:mm:ss*/
 void convertTime(int time, bool jiffies)
 {
   int dias, horas, minutos, segundos;
-  int JpS=100;
+  int JpS= 100; 
   if(jiffies) time = time/JpS;
 
   dias = time / 86400;
@@ -40,13 +38,12 @@ void filesystem(void)
  int contador = 0;
  char linea[1000];
 
-  /* archivos soportados */
   while (fgets(linea, sizeof linea, files) != NULL) contador++;
   fclose(files);
 
   printf("Cantidad de archivos soportados: %d\n", contador);
 }
-/**  nombre fecha hora */
+
 void header(void)
 {
   char *nombre;
@@ -58,7 +55,7 @@ void header(void)
   char linea[100];
 
   nombre = fgets(linea,sizeof linea, nombre_file);
-  nombre[strlen(nombre)-1] = 0; // Quita el salto de linea
+  nombre[strlen(nombre)-1] = 0; 
   fclose(nombre_file);
 
   FILE *time = fopen(path_time, "r");
@@ -69,7 +66,6 @@ void header(void)
 
   printf("%s %s %s\n", nombre, fecha, hora);
 }
-/**Imprime la info*/
 void imprimirDefault(void)
 {
   header();
@@ -78,7 +74,7 @@ void imprimirDefault(void)
   uptime();
   filesystem();
 }
-/** Toma la version del kernel*/
+
 void kernelversion(void)
 {
   char path_kernel[] = "/proc/sys/kernel/osrelease";
@@ -90,7 +86,7 @@ void kernelversion(void)
   fclose(kernel);
   printf(" - Version de kernel: %s\n", version);
 }
-/**abre el archivo cpuinfo y busca la información pedida*/
+
 char* obtenerInfo(char* key, FILE *archivo)
 {
   char *valor;
@@ -129,6 +125,5 @@ void uptime(void)
 
   fclose(tiempo);
 
-  printf("Tiempo transcurrido desde inicio: ",tiempo);
   convertTime(uptime,false);
 }
