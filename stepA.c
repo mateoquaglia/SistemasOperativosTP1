@@ -18,6 +18,20 @@ void cpuinfo(void)
         tipo, modelo);
 }
 
+/**convierto el tiempo a dd hh:mm:ss*/
+void convertTime(int time, bool jiffies)
+{
+  int dias, horas, minutos, segundos;
+
+  /* Conversion de segundos a dd hh:mm:ss */
+  dias = time / 86400;
+  horas = (time % 86400) / 3600;
+  minutos = (time % 3600) / 60;
+  segundos = (time % 3600) % 60;
+
+  printf("%02d D, %02d:%02d:%02d\n", dias, horas, minutos, segundos);
+}
+
 void filesystem(void)
 {
   char path_files[] = "/proc/filesystems";
@@ -115,5 +129,5 @@ void uptime(void)
   fclose(tiempo);
 
   printf("Tiempo transcurrido desde inicio: ",tiempo);
-  
+  convertTime(uptime,false);
 }
