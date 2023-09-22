@@ -40,7 +40,7 @@ void memstats(int a, int b)
     printf("Peticiones a disco: %d\n", petitions);
     printf("Memoria disponible / total: %d / %d\n",
           available, total);
-    printf("Promedio de carga en el último minuto: %.2f\n", min);
+    printf("carga en el último minuto: %.2f\n", min);
     printf("[Pausa de %d segundos]\n\n", a);
     sleep(a);
   }
