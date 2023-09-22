@@ -23,7 +23,8 @@ void convertTime(int time, bool jiffies)
 {
   int dias, horas, minutos, segundos;
 
-  /* Conversion de segundos a dd hh:mm:ss */
+  if(jiffies) time = time/JpS;
+
   dias = time / 86400;
   horas = (time % 86400) / 3600;
   minutos = (time % 3600) / 60;
