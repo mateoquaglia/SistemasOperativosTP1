@@ -1,5 +1,5 @@
 #include "StepD.h"
-/*permisos, tipo de archivo y el path de los file descriptors*/
+
 void file_descriptors(int pid)
 {
   DIR *descriptor;
@@ -26,7 +26,7 @@ void file_descriptors(int pid)
 
       path = malloc(mystats.st_size + 1); // reservo dinamicamente memoria para almacenar el camino
 
-      /* lectura, escritura y ejecución */
+    
       printf( (mystats.st_mode & S_IRUSR) ? "r" : "-");
       printf( (mystats.st_mode & S_IWUSR) ? "w" : "-");
       printf( (mystats.st_mode & S_IXUSR) ? "x" : "-");
@@ -37,7 +37,6 @@ void file_descriptors(int pid)
       printf( (mystats.st_mode & S_IWOTH) ? "w" : "-");
       printf( (mystats.st_mode & S_IXOTH) ? "x" : "-");
 
-      /* tipo de archivo */
       switch (mystats.st_mode & S_IFMT)
       {
         case S_IFBLK:  printf(" BLK "); break; /* Block */
@@ -58,7 +57,7 @@ void file_descriptors(int pid)
   }
   closedir(descriptor);
 }
-/* limites del proceso*/
+
 void limits(int pid)
 {
   char limits[45];
@@ -76,7 +75,7 @@ void limits(int pid)
 
   printf("Soft limits / Hard limits: %d / %d\n", soft, hard);
 }
-/*stack trace*/
+
 void stack(int pid)
 {
   char stack[45];
