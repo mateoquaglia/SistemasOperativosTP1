@@ -22,7 +22,7 @@ void cpuinfo(void)
 void convertTime(int time, bool jiffies)
 {
   int dias, horas, minutos, segundos;
-
+  int Jps=100;
   if(jiffies) time = time/JpS;
 
   dias = time / 86400;
